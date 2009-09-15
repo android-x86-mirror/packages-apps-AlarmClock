@@ -54,7 +54,7 @@ public class AlarmAlert extends Activity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
+        AlarmClock.setVolumeControlForPlatform(this);
         // Maintain a lock during the playback of the alarm. This lock may have
         // already been acquired in AlarmReceiver. If the process was killed,
         // the global wake lock is gone. Acquire again just to be sure.

@@ -98,7 +98,7 @@ public class SetAlarm extends PreferenceActivity
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
+        AlarmClock.setVolumeControlForPlatform(this);
         addPreferencesFromResource(R.xml.alarm_prefs);
         mLabel = (EditTextPreference) findPreference("label");
         mLabel.setOnPreferenceChangeListener(
@@ -114,6 +114,7 @@ public class SetAlarm extends PreferenceActivity
         mTimePref = findPreference("time");
         mAlarmPref = (AlarmPreference) findPreference("alarm");
         mVibratePref = (CheckBoxPreference) findPreference("vibrate");
+        mVibratePref.setEnabled(!AlarmClock.isVolumeAdjustable());
         mRepeatPref = (RepeatPreference) findPreference("setRepeat");
 
         Intent i = getIntent();
@@ -217,7 +218,7 @@ public class SetAlarm extends PreferenceActivity
         mMinutes = minutes;
         mAlarmOnPref.setChecked(enabled);
         mDaysOfWeek.set(daysOfWeek);
-        mVibratePref.setChecked(vibrate);
+        mVibratePref.setChecked(vibrate && !AlarmClock.isVolumeAdjustable());
 
         if (alert == null || alert.length() == 0) {
             if (Log.LOGV) Log.v("****** reportAlarm null or 0-length alert");
@@ -276,12 +277,18 @@ public class SetAlarm extends PreferenceActivity
      * contain the old value (i.e. during the preference value change).
      */
     private void saveAlarm(boolean popToast, String label) {
-        if (mReportAlarmCalled && mAlarmPref.mAlert != null) {
-            String alertString = mAlarmPref.mAlert.toString();
-            saveAlarm(this, mId, mAlarmOnPref.isChecked(), mHour, mMinutes,
-                      mDaysOfWeek, mVibratePref.isChecked(), label, alertString,
-                      popToast);
-        }
+    	if (mReportAlarmCalled) {
+	    	if(mAlarmPref.mAlert != null){
+		    	String alertString = mAlarmPref.mAlert.toString();
+		    	saveAlarm(this, mId, mAlarmOnPref.isChecked(), mHour, mMinutes,
+			    	mDaysOfWeek, mVibratePref.isChecked(), label, alertString,
+			    	popToast);
+	    	}else{
+		    	saveAlarm(this, mId, mAlarmOnPref.isChecked(), mHour, mMinutes,
+			    	mDaysOfWeek, mVibratePref.isChecked(), label, label,
+			    	popToast);
+	    	}
+    	}
     }
 
     /**
