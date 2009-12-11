@@ -44,6 +44,8 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.CheckBox;
+import android.os.SystemProperties;
+import android.media.AudioManager;
 
 import java.util.Calendar;
 import java.text.DateFormatSymbols;
@@ -70,6 +72,7 @@ public class AlarmClock extends Activity implements OnItemClickListener {
     private View mClock = null;
     private ListView mAlarmsList;
     private Cursor mCursor;
+    private static boolean volumeAdjustable;
 
     private String mAm, mPm;
 
@@ -198,6 +201,8 @@ public class AlarmClock extends Activity implements OnItemClickListener {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        volumeAdjustable=SystemProperties.getBoolean("ro.alarm.volume.adjustable",false);
+        AlarmClock.setVolumeControlForPlatform(this);
 
         String[] ampm = new DateFormatSymbols().getAmPmStrings();
         mAm = ampm[0];
@@ -379,5 +384,16 @@ public class AlarmClock extends Activity implements OnItemClickListener {
 
     private void saveClockVisibility() {
         mPrefs.edit().putBoolean(PREF_SHOW_CLOCK, getClockVisibility()).commit();
+    }
+    public static void setVolumeControlForPlatform(Activity context) {
+        if (isVolumeAdjustable()) {
+            context.setVolumeControlStream(AudioManager.STREAM_ALARM);
+        } else {
+            // Use default stream type,the default type use a fixed volume
+            context.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+        }
+    }
+    public static boolean isVolumeAdjustable(){
+	return 	volumeAdjustable;
     }
 }

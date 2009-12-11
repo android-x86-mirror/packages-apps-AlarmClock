@@ -45,6 +45,7 @@ public class ClockPicker extends Activity implements
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        AlarmClock.setVolumeControlForPlatform(this);
 
         mFactory = LayoutInflater.from(this);
         setContentView(R.layout.clockpicker);
